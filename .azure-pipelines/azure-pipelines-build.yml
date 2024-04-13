@@ -40,8 +40,8 @@ steps:
       $version = "$($parts[0]).$($parts[1]).$($parts[2])"
       Write-Host "Version: $version"
       $version | Out-File "$(Build.ArtifactStagingDirectory)\version.txt"
-      Get-ChildItem -Path "$(Build.SourcesDirectory)\source\AccUnit\bin\$(buildConfiguration)"
-      Compress-Archive -Path "$(Build.SourcesDirectory)\source\AccUnit\bin\$(buildConfiguration)\AccessCodeLib.*.dll" -DestinationPath "$(Build.ArtifactStagingDirectory)\VbeUserControlHost.$($version).lib.zip"
+      Get-ChildItem -Path "$(Build.SourcesDirectory)\source\AccessCodeLib.Common.VbeUserControlHost\bin\$(buildConfiguration)"
+      Compress-Archive -Path "$(Build.SourcesDirectory)\source\AccessCodeLib.Common.VbeUserControlHost\bin\$(buildConfiguration)\AccessCodeLib.*.dll" -DestinationPath "$(Build.ArtifactStagingDirectory)\VbeUserControlHost.$($version).lib.zip"
   displayName: 'Read Version and create zip file'
 
 - task: PublishBuildArtifacts@1
