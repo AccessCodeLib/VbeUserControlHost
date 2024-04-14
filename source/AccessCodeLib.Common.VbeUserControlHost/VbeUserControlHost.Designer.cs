@@ -30,13 +30,13 @@
         {
             this.SuspendLayout();
             // 
-            // VbideUserControlHost
+            // VbeUserControlHost
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.Name = "VbideUserControlHost";
-            this.Size = new System.Drawing.Size(878, 593);
+            this.Name = "VbeUserControlHost";
+            this.Size = new System.Drawing.Size(400, 300);
             this.ResumeLayout(false);
 
         }

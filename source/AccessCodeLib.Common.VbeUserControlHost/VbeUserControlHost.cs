@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Windows.Forms.Integration;
 
 namespace AccessCodeLib.Common.VBIDETools
 {
@@ -26,6 +27,17 @@ namespace AccessCodeLib.Common.VBIDETools
             _resizeWindow.Init(this, GetParentVbeWindowHandle());
             Controls.Add(UserControlToHost);
             UserControlToHost.Dock = DockStyle.Fill;
+        }
+
+        public void HostUserControl(System.Windows.Controls.UserControl UserControlToHost)
+        {
+            _resizeWindow.Init(this, GetParentVbeWindowHandle());
+            var host = new ElementHost();
+            host.Size = new Size(300, 200);
+            host.BackColor = Color.DarkCyan;
+            host.Dock = DockStyle.Fill;
+            host.Child = UserControlToHost;
+            Controls.Add(host);
         }
 
         private IntPtr GetParentVbeWindowHandle()

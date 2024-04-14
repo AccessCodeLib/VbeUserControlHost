@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
+using Forms = System.Windows.Forms;
+using WPF = System.Windows.Controls;
 using Microsoft.Vbe.Interop;
 
 namespace AccessCodeLib.Common.VBIDETools
 {
     public class VbeUserControl<TControl> : IDisposable
-            where TControl : UserControl
     {
         private readonly TControl _control;
         private readonly Window _vbeWindow;
@@ -21,14 +21,28 @@ namespace AccessCodeLib.Common.VBIDETools
                                                             caption, positionGuid, ref docObj);
             _vbeWindow.Visible = true;
 
-            if (!(docObj is IVbeUserControlHost userControlHost))
-            {
-                throw new InvalidComObjectException(string.Format("docObj cannot be casted to IVbeUserControlHost"));
-            }
-
             _control = controlToHost;
-            userControlHost.HostUserControl(_control);
-
+            if (_control is Forms.UserControl winFormControl)
+            {
+                if (!(docObj is IVbeWindowsFormsUserControlHost userControlHost))
+                {
+                    throw new InvalidComObjectException(string.Format("docObj cannot be casted to IVbeWindowsFormsUserControlHost"));
+                }
+                userControlHost.HostUserControl(winFormControl);
+            }
+            else if (_control is WPF.UserControl wpfControl)
+            {
+                if (!(docObj is IVbeWPFUserControlHost userControlHost))
+                {
+                    throw new InvalidComObjectException(string.Format("docObj cannot be casted to IVbeWPFUserControlHost"));
+                }
+                userControlHost.HostUserControl(wpfControl);
+            }
+            else
+            {
+                throw new ArgumentException("controlToHost must be a System.Windows.Forms.UserControl or a System.Windows.Controls.UserControl");
+            }       
+            
             if (!visible)
             {
                 _vbeWindow.Visible = false;
@@ -99,7 +113,7 @@ namespace AccessCodeLib.Common.VBIDETools
         #endregion
     }
 
-    internal class SubClassingResizeWindow : NativeWindow
+    internal class SubClassingResizeWindow : Forms.NativeWindow
     {
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -120,11 +134,11 @@ namespace AccessCodeLib.Common.VBIDETools
             public int Bottom;
         }
 
-        private readonly Control _userControl;
-        private readonly Microsoft.Vbe.Interop.Window _vbeWindow;
+        private readonly Forms.Control _userControl;
+        private readonly Window _vbeWindow;
         private Size _lastSize;
 
-        public SubClassingResizeWindow(Control userControl, Microsoft.Vbe.Interop.Window vbeWindow)
+        public SubClassingResizeWindow(Forms.Control userControl, Window vbeWindow)
         {
             _userControl = userControl;
             _vbeWindow = vbeWindow;
@@ -138,7 +152,7 @@ namespace AccessCodeLib.Common.VBIDETools
             CheckSize();
         }
 
-        private static IntPtr FindVbeWindowHostHwnd(Microsoft.Vbe.Interop.Window vbeWindow)
+        private static IntPtr FindVbeWindowHostHwnd(Window vbeWindow)
         {
             const string DockedWindowClass = "wndclass_desked_gsk";
             const string FloatingWindowClass = "VBFloatingPalette";
@@ -157,7 +171,7 @@ namespace AccessCodeLib.Common.VBIDETools
             return hWnd;
         }
 
-        private static bool IsDockedWindow(Microsoft.Vbe.Interop.Window vbeWindow)
+        private static bool IsDockedWindow(Window vbeWindow)
         {
             return vbeWindow.LinkedWindowFrame.Type == vbext_WindowType.vbext_wt_MainWindow;
         }
@@ -174,7 +188,7 @@ namespace AccessCodeLib.Common.VBIDETools
             }
         }
 
-        protected override void WndProc(ref Message m)
+        protected override void WndProc(ref Forms.Message m)
         {
             const int WM_SIZE = 0x0005;
 
