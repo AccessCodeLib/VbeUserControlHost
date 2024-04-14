@@ -1,5 +1,5 @@
 # VbeUserControlHost
-.net UserControl host for VBIDE (VBE Add-ins)
+.NET UserControl host for VBIDE (VBE Add-ins)
 
 COM registration of VbeUserControlHost required
 
@@ -11,7 +11,7 @@ COM registration of VbeUserControlHost required
  
 ```
 var vbeControl = new VbeUserControl<TypeOfUserControlToHost>(
-                        AddIn,
+                        VbeAddIn,
                         "VBE Window Caption",
                         UserControlToHost.PositionGuid,
                         InstanceOfUserControlToHost);
