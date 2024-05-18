@@ -10,14 +10,14 @@ namespace AccessCodeLib.Common.VBIDETools
     public class VbeUserControl<TControl> : IDisposable
     {
         private readonly TControl _control;
-        private readonly Window _vbeWindow;
+        private Window _vbeWindow;
 
         public VbeUserControl(AddIn addIn, string caption, string positionGuid, 
                                 TControl controlToHost, bool visible = true,
-                                string VbideUserControlHostProgId = VbeUserControlHostSettings.ProgId)
+                                string vbideUserControlHostProgId = VbeUserControlHostSettings.ProgId)
         {
             object docObj = null;
-            _vbeWindow = addIn.VBE.Windows.CreateToolWindow(addIn, VbideUserControlHostProgId,
+            _vbeWindow = addIn.VBE.Windows.CreateToolWindow(addIn, vbideUserControlHostProgId,
                                                             caption, positionGuid, ref docObj);
             _vbeWindow.Visible = true;
 
@@ -88,16 +88,33 @@ namespace AccessCodeLib.Common.VBIDETools
             {
                 DisposeManagedResources();
             }
+            DisposeUnmanagedResources();
             _disposed = true;
         }
 
         private void DisposeManagedResources()
         {
-            try
+            if (_control is IDisposable disposableControl)
             {
-                _vbeWindow.Close();
+                disposableControl.Dispose();
             }
-            catch { /* ignore */ }
+        }   
+
+        private void DisposeUnmanagedResources()
+        {
+            if (_vbeWindow != null)
+            {
+                try
+                {
+                    _vbeWindow.Close();
+                }
+                catch { /* ignore */ }
+                finally
+                {
+                    Marshal.ReleaseComObject(_vbeWindow);
+                    _vbeWindow = null;
+                }
+            }
         }
 
         public void Dispose()
